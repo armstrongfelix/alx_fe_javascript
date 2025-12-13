@@ -56,6 +56,6 @@ const All = () => {
   });
 };
 
-addQuotebtn.addEventListener("click", addQuote);
+// addQuotebtn.addEventListener("click", addQuote);
 showQuote.addEventListener("click", displayRandomQuote);
 showAll.addEventListener("click", All);
