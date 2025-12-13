@@ -32,7 +32,7 @@ const newQuoteCategory = document.getElementById("newQuoteCategory");
  * Check 2: Implements displayRandomQuote function.
  * Check 3: Logic to select a random quote and update the DOM.
  */
-function addQuote() {
+function createAddQuoteForm() {
   const text = newQuoteText.value.trim();
   const category = newQuoteCategory.value.trim();
 
