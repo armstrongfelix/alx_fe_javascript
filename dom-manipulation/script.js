@@ -48,7 +48,10 @@ const displayquote = () => {
 const All = () => {
   let all = document.createElement("p");
   quoteList.forEach((quoteObj) => {
-    all.innerHTML += `Quote: "${quoteObj.quote}" | Category: ${quoteObj.quoteCategory} <br>`;
+    all.innerHTML = `Quote: "${quoteObj.quote}" | Category: ${quoteObj.quoteCategory} <br>`;
+    all.style.margin = "10px";
+    all.style.padding = "5px";
+    all.style.color = "blue";
   });
   displayScreen.appendChild(all);
 };
