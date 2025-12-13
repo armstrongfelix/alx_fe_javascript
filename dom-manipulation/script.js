@@ -32,33 +32,6 @@ const newQuoteCategory = document.getElementById("newQuoteCategory");
  * Check 2: Implements displayRandomQuote function.
  * Check 3: Logic to select a random quote and update the DOM.
  */
-function showRandomQuote() {
-  // 1. Select a random quote from the array
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  const quote = quotes[randomIndex];
-
-  // 2. Clear previous content
-  quoteDisplay.innerHTML = "";
-
-  // 3. Create the quote text element
-  const quoteTextElement = document.createElement("p");
-  quoteTextElement.className = "quote-text";
-  quoteTextElement.textContent = `"${quote.text}"`;
-
-  // 4. Create the category element
-  const quoteCategoryElement = document.createElement("p");
-  quoteCategoryElement.className = "quote-category";
-  quoteCategoryElement.textContent = `— Category: ${quote.category}`;
-
-  // 5. Append the new elements to the display container
-  quoteDisplay.appendChild(quoteTextElement);
-  quoteDisplay.appendChild(quoteCategoryElement);
-}
-
-/**
- * Check 4: Implements the addQuote function.
- * Check 5: Logic to add a new quote to the quotes array and update the DOM.
- */
 function addQuote() {
   const text = newQuoteText.value.trim();
   const category = newQuoteCategory.value.trim();
@@ -68,6 +41,34 @@ function addQuote() {
     alert("Please enter both the quote text and a category.");
     return; // Stop the function if validation fails
   }
+
+  function showRandomQuote() {
+    // 1. Select a random quote from the array
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    const quote = quotes[randomIndex];
+
+    // 2. Clear previous content
+    quoteDisplay.innerHTML = "";
+
+    // 3. Create the quote text element
+    const quoteTextElement = document.createElement("p");
+    quoteTextElement.className = "quote-text";
+    quoteTextElement.textContent = `"${quote.text}"`;
+
+    // 4. Create the category element
+    const quoteCategoryElement = document.createElement("p");
+    quoteCategoryElement.className = "quote-category";
+    quoteCategoryElement.textContent = `— Category: ${quote.category}`;
+
+    // 5. Append the new elements to the display container
+    quoteDisplay.appendChild(quoteTextElement);
+    quoteDisplay.appendChild(quoteCategoryElement);
+  }
+
+  /**
+   * Check 4: Implements the addQuote function.
+   * Check 5: Logic to add a new quote to the quotes array and update the DOM.
+   */
 
   // 1. Create a new quote object
   const newQuote = {

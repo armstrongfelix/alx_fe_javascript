@@ -37,6 +37,7 @@ const quoteAdd = () => {
 
 const displayquote = () => {
   if (quoteList.length === 0) {
+    displayScreen.innerHTML = "";
     displayScreen.innerHTML = "<p>No quotes available. Please add a quote.</p>";
     return;
   }
@@ -45,8 +46,8 @@ const displayquote = () => {
   displayScreen.innerHTML = `<p> Quote: "${randomQuote.quote} <br> "Category: ${randomQuote.quoteCategory}</p>`;
 };
 
-let checker = null;
 const All = () => {
+  displayScreen.innerHTML = "";
   quoteList.forEach((quoteObj) => {
     let all = document.createElement("p");
     all.innerHTML = `<br>Quote: "${quoteObj.quote}" <br> Category: ${quoteObj.quoteCategory}<br>`;
