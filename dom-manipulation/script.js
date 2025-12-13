@@ -46,14 +46,14 @@ const displayquote = () => {
 };
 
 const All = () => {
-  let all = document.createElement("p");
   quoteList.forEach((quoteObj) => {
-    all.innerHTML = `Quote: "${quoteObj.quote}" | Category: ${quoteObj.quoteCategory} <br>`;
+    let all = document.createElement("p");
+    all.innerHTML = `<br> Quote: "${quoteObj.quote}" <br> Category: ${quoteObj.quoteCategory}<br>`;
     all.style.margin = "10px";
     all.style.padding = "5px";
     all.style.color = "blue";
+    displayScreen.appendChild(all);
   });
-  displayScreen.appendChild(all);
 };
 
 addQuote.addEventListener("click", quoteAdd);
