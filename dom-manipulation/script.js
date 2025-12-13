@@ -1,12 +1,12 @@
 const newQuoteText = document.querySelector("#newQuoteText");
 const newQuoteCategory = document.querySelector("#newQuoteCategory");
-const addQuote = document.querySelector("#addQuote");
+const addQuotebtn = document.querySelector("#addQuotebtn");
 const showQuote = document.querySelector("#showQuote");
 const displayScreen = document.querySelector("#displayScreen");
 const quoteKey = document.querySelector("#quoteKey");
 const showAll = document.querySelector("#showAll");
 const quoteList = [];
-const quoteAdd = () => {
+const addQuote = () => {
   if (
     newQuoteText.value.trim() === "" ||
     newQuoteCategory.value.trim() === "" ||
@@ -35,7 +35,7 @@ const quoteAdd = () => {
   return;
 };
 
-const displayquote = () => {
+const displayRandomQuote = () => {
   if (quoteList.length === 0) {
     displayScreen.innerHTML = "<p>No quotes available. Please add a quote.</p>";
     return;
@@ -56,6 +56,6 @@ const All = () => {
   });
 };
 
-addQuote.addEventListener("click", quoteAdd);
-showQuote.addEventListener("click", displayquote);
+addQuotebtn.addEventListener("click", addQuote);
+showQuote.addEventListener("click", displayRandomQuote);
 showAll.addEventListener("click", All);
