@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Quote Generator</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Dynamic Quote Generator</h1>
+      <section>
+        <div>
+          <input
+            id="newQuoteText"
+            type="text"
+            placeholder="Enter a new quote"
+          />
+          <input
+            id="newQuoteCategory"
+            type="text"
+            placeholder="Enter quote category"
+          />
+          <input id="quoteKey" type="text" placeholder="Enter quote key" />
+
+          <button id="addQuote">Add Quote</button>
+        </div>
+        <div>
+          <div id="displayScreen"></div>
+
+          <button id="showQuote">Random Quote</button>
+          <h2>Show all qoutes</h2>
+          <button id="showAll">show all</button>
+        </div>
+      </section>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>
