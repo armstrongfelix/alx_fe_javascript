@@ -7,33 +7,30 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main>
-      <h1>Dynamic Quote Generator</h1>
-      <section>
-        <div>
-          <input
-            id="newQuoteText"
-            type="text"
-            placeholder="Enter a new quote"
-          />
-          <input
-            id="newQuoteCategory"
-            type="text"
-            placeholder="Enter quote category"
-          />
-          <input id="quoteKey" type="text" placeholder="Enter quote key" />
+    <h1>Dynamic Quote Generator</h1>
 
-          <button onclick="addQuote" id="addQuotebtn">Add Quote</button>
-        </div>
-        <div>
-          <div id="displayScreen"></div>
+    <div id="quoteDisplay"></div>
 
-          <button id="showQuote">Random Quote</button>
-          <h2>Show all qoutes</h2>
-          <button id="showAll">show all</button>
-        </div>
-      </section>
-    </main>
+    <button id="newQuote">Show New Quote</button>
+
+    <div id="newQuoteForm">
+      <h3>Add New Quote</h3>
+      <input
+        id="newQuoteText"
+        type="text"
+        placeholder="Enter a new quote"
+        size="50"
+        required
+      />
+      <input
+        id="newQuoteCategory"
+        type="text"
+        placeholder="Enter quote category"
+        required
+      />
+      <button id="addQuoteBtn" onclick="addQuote()">Add Quote</button>
+    </div>
+
     <script src="./script.js"></script>
   </body>
 </html>

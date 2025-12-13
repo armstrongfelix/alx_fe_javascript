@@ -1,70 +1,31 @@
-* {
-  padding: 0px;
-  margin: 0px;
-  box-sizing: border-box;
-}
-
 body {
-  background: white;
+  font-family: Arial, sans-serif;
+  margin: 20px;
 }
-
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
-  background: wheat;
-  gap: 20px;
+#quoteDisplay {
+  border: 1px solid #ccc;
   padding: 20px;
+  margin-bottom: 20px;
+  min-height: 50px;
 }
-
-section {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
+.quote-text {
+  font-size: 1.5em;
+  font-style: italic;
 }
-
-section > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.quote-category {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 10px;
+}
+#newQuoteForm {
+  margin-top: 30px;
   padding: 15px;
-  border-radius: 10px;
-  border-color: aqua;
-  height: 85vh;
-  width: 45vw;
-  background: white;
+  border: 1px solid #eee;
+  background-color: #f9f9f9;
 }
-
-input {
-  padding: 10px 30px;
-  border-radius: 5px;
-  border: 1px solid gray;
-}
-
-button {
-  width: 150px;
-  color: bisque;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: slateblue;
-  cursor: pointer;
-}
-button:hover {
-  background: blueviolet;
-}
-button:active {
-  transform: scale(0.98);
-}
-
-#displayScreen {
-  overflow-y: scroll;
+#newQuoteForm input,
+#newQuoteForm button {
+  padding: 8px;
+  margin-right: 10px;
+  margin-bottom: 10px;
 }
