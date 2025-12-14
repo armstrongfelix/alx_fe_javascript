@@ -27,6 +27,10 @@ const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteButton = document.getElementById("newQuote");
 const newQuoteText = document.getElementById("newQuoteText");
 const newQuoteCategory = document.getElementById("newQuoteCategory");
+importFile = document.querySelector("#importFile");
+exportButton = document.querySelector("#exportButton");
+const LOCAL_STORAGE_KEY = "quotesData";
+const SESSION_STORAGE_KEY = "lastViewedQuoteIndex";
 
 /**
  * Check 2: Implements displayRandomQuote function.
@@ -78,6 +82,7 @@ function createAddQuoteForm() {
 
   // 2. Add the new quote to the global array
   quotes.push(newQuote);
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(quoteList));
 
   // 3. Clear the input fields for the next entry
   newQuoteText.value = "";
@@ -93,3 +98,54 @@ newQuoteButton.addEventListener("click", showRandomQuote);
 
 // Initial call to display a quote when the page loads
 showRandomQuote();
+
+function saveQuotes() {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(quotes));
+}
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function (event) {
+    const importedQuotes = JSON.parse(event.target.result);
+    quotes.push(...importedQuotes);
+    saveQuotes();
+    alert("Quotes imported successfully!");
+  };
+  fileReader.readAsText(event.target.files[0]);
+}
+
+/**
+ * Step 2: JSON Export
+ * Allows the user to download the current quotes array as a JSON file.
+ * NOTE: Assumes 'quotes' is your global array containing the quote objects.
+ */
+function exportQuotes() {
+  // 1. Convert the JavaScript object (quotes array) into a JSON string
+  // The 'null, 2' arguments make the JSON output nicely formatted (pretty-printed)
+  const jsonString = JSON.stringify(quoteList, null, 2);
+
+  // 2. Create a Blob from the JSON string with the correct MIME type
+  const blob = new Blob([jsonString], { type: "application/json" });
+
+  // 3. Create a temporary URL for the Blob object
+  const url = URL.createObjectURL(blob);
+
+  // 4. Create a temporary <a> link element
+  const a = document.createElement("a");
+
+  // 5. Set the link's attributes for download
+  a.href = url;
+  a.download = "quotes_export.json"; // Suggested filename
+
+  // 6. Programmatically click the link to start the download
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // 7. Clean up the temporary object URL to free up memory
+  URL.revokeObjectURL(url);
+
+  alert("Quotes exported as quotes_export.json!");
+}
+
+importFile.addEventListener("onchange", importFromJsonFile);
+exportButton.addEventListener("click", exportQuotes);

@@ -12,6 +12,12 @@
     <div id="quoteDisplay"></div>
 
     <button id="newQuote">Show New Quote</button>
+    <input
+      type="file"
+      id="importFile"
+      accept=".json"
+      placeholder="click to import from local storage"
+    />
 
     <div id="newQuoteForm">
       <h3>Add New Quote</h3>
@@ -29,6 +35,8 @@
         required
       />
       <button id="addQuoteBtn" onclick="createAddQuoteForm()">Add Quote</button>
+      <h4>if You wish, you can Export your data by clicking the button</h4>
+      <button id="exportButton">Export to JSON</button>
     </div>
 
     <script src="./script.js"></script>
