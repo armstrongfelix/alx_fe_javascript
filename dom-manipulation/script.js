@@ -361,98 +361,201 @@ function addQuote() {
   }
 }
 
-// script.js (Continuing from all previous tasks)
-
-// Simulated server data (can be replaced with fetch to a real API)
-let serverQuotes = [
-  {
-    text: "Server: Consistency is the key to mastery.",
-    category: "Discipline",
-    id: 1,
-  },
-  {
-    text: "Server: Code is read much more often than it is written.",
-    category: "Programming",
-    id: 2,
-  },
-];
-
-// Helper function to simulate fetching data from a server
-async function getServerQuotes() {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // In a real app: const response = await fetch('YOUR_API_ENDPOINT/quotes');
-  // const data = await response.json();
-  // return data;
-
-  return serverQuotes; // Return the simulated data
+// Example Quote Structure
+{
+  id: 1,
+  quoteText: "The only way to do great work is to love what you do.",
+  author: "Steve Jobs",
+  // A timestamp for comparison is crucial for conflict resolution
+  timestamp: Date.now()
 }
 
-// Function to sync local data with server data
-async function syncQuotes() {
-  console.log("Starting data sync...");
-
-  const serverData = await getServerQuotes();
-
-  if (!serverData) {
-    console.error("Failed to fetch server data.");
-    return;
-  }
-
-  // Server-Wins Conflict Resolution Strategy (Step 2)
-  // The server's quotes array is considered the source of truth.
-  // We append any *unique* local quotes that are missing from the server.
-
-  let mergedQuotes = [...serverData];
-  let conflictCount = 0;
-  let newLocalCount = 0;
-
-  // Simple resolution: quotes with the same text/category are considered conflicts,
-  // and the server's version (if any) is kept.
-  // For a robust system, you'd use unique IDs and timestamps.
-  const serverQuoteTexts = new Set(serverData.map((q) => q.text));
-
-  quotes.forEach((localQuote) => {
-    if (!serverQuoteTexts.has(localQuote.text)) {
-      // This is a new quote only available locally
-      mergedQuotes.push(localQuote);
-      newLocalCount++;
-    } else {
-      // A quote with the same text exists on the server.
-      // Under the "Server Wins" rule, we discard the local copy if it's different.
-      conflictCount++;
+async function fetchQuotesFromServer() {
+  const MOCK_API_URL = 'https://jsonplaceholder.typicode.com/posts?_limit=10';
+  // Note: Using a real mock API means you'll need to adapt their data
+  // to your expected quote format.
+  try {
+    const response = await fetch(MOCK_API_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  });
+    const serverData = await response.json();
 
-  quotes = mergedQuotes; // Update the local array with the merged data
-  saveQuotes(); // Save the new array to local storage
-  populateCategories(); // Update filter options
-  filterQuotes(); // Refresh display
+    // Map the mock data to your quote structure
+    return serverData.map(item => ({
+      id: item.id,
+      quoteText: item.title, // or item.body
+      author: `User ${item.userId}`, // Mock author
+      timestamp: Date.now() // Mock timestamp for demo purposes
+    }));
 
-  // Notification System (Step 3)
-  let syncMessage = `Sync complete. ${serverData.length} quotes from server.`;
-  if (newLocalCount > 0) {
-    syncMessage += ` ${newLocalCount} new local quotes added.`;
+  } catch (error) {
+    console.error("Error fetching quotes from server:", error);
+    return []; // Return empty array on failure
   }
-  if (conflictCount > 0) {
-    syncMessage += ` ${conflictCount} potential local conflicts resolved (Server Wins).`;
-  }
+}
+async function postQuotesToServer(localQuotes) {
+  const MOCK_API_URL = 'https://jsonplaceholder.typicode.com/posts'; // Using POST for simulation
+  try {
+    // We only need to simulate a successful send for the task's scope
+    const response = await fetch(MOCK_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // In a real app, you might only send the *changes*
+      body: JSON.stringify(localQuotes),
+    });
 
-  alert(`Data Sync Status:\n${syncMessage}`);
-  console.log(syncMessage);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log("Local quotes successfully simulated-posted to server.");
+    // Return the server response (e.g., the new IDs/timestamps)
+    return await response.json(); 
+
+  } catch (error) {
+    console.error("Error posting quotes to server:", error);
+    // Notify the user of the sync failure (Step 3)
+    displayNotification('❌ Sync Failed! Could not save local changes to server.', 'error');
+  }
 }
 
-// Set up periodic syncing (e.g., every 60 seconds)
-// Note: In a real app, this should only happen when the user is active.
-// setInterval(syncQuotes, 60000);
+// const LOCAL_STORAGE_KEY = 'dynamic_quotes';                                                
 
-// Add a manual sync button to index.html
-// <button onclick="syncQuotes()">Manual Sync with Server</button>
+// Helper to get local quotes
+function getLocalQuotes() {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+    try {
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        console.error("Error parsing local storage data:", e);
+        return [];
+    }
+}
 
-// Initial sync on page load (after loading local quotes)
-// loadQuotes();
-// syncQuotes();
-// populateCategories();
-// restoreFilter();
-// filterQuotes();
+// Helper to save local quotes
+function saveLocalQuotes(quotes) {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(quotes));
+    // Optional: Re-render UI after saving
+    // updateQuoteUI(quotes);
+}
+
+/**
+ * Main function to sync local data with server.
+ * Strategy: Server data takes precedence (overwrite local changes).
+ */
+async function syncQuotes() {
+    console.log("Starting data sync...");
+    let conflictsResolved = 0;
+    let newQuotesCount = 0;
+    
+    // 1. Fetch data from the server
+    const serverQuotes = await fetchQuotesFromServer();
+    const localQuotes = getLocalQuotes();
+    
+    // Convert local quotes to a Map for O(1) lookup by ID
+    const localQuotesMap = new Map(localQuotes.map(q => [q.id, q]));
+    
+    // The final set of quotes after resolving conflicts
+    const newLocalQuotes = []; 
+
+    serverQuotes.forEach(serverQuote => {
+        const localQuote = localQuotesMap.get(serverQuote.id);
+
+        if (localQuote) {
+            // Check for conflict (assuming a difference in content/timestamp)
+            // In a real app, you would check timestamps or hashes.
+            // For this simple simulation, we assume any local change is a 'conflict' 
+            // and the server version is always newer/correct (precedence rule).
+            
+            // Simple check: If quote texts are different, a conflict occurred
+            if (localQuote.quoteText !== serverQuote.quoteText) {
+                 // **CONFLICT RESOLUTION: Server takes precedence**
+                newLocalQuotes.push(serverQuote);
+                conflictsResolved++;
+                // Remove from map to track remaining local-only quotes
+                localQuotesMap.delete(serverQuote.id); 
+            } else {
+                // No conflict, keep the existing quote (or server's if timestamps match)
+                newLocalQuotes.push(serverQuote); 
+                localQuotesMap.delete(serverQuote.id);
+            }
+        } else {
+            // Server has a quote that local doesn't have (NEW QUOTE)
+            newLocalQuotes.push(serverQuote);
+            newQuotesCount++;
+        }
+    });
+
+    // Handle quotes that exist locally but not on the server (deleted/not yet uploaded)
+    // For this basic sync (server precedence), we typically drop them, or 
+    // attempt to post them to the server first (simulated in postQuotesToServer).
+    
+    // **For simplicity and adherence to "server takes precedence"**, 
+    // we use ONLY the quotes found on the server.
+    
+    // 2. Update local storage with the resolved data
+    saveLocalQuotes(newLocalQuotes);
+
+    // 3. Notify the user
+    if (newQuotesCount > 0) {
+        displayNotification(`✅ Sync Complete: ${newQuotesCount} new quotes added from server.`, 'success');
+    }
+    if (conflictsResolved > 0) {
+        displayNotification(`⚠️ Conflicts Resolved: ${conflictsResolved} quote(s) updated with server data (server precedence).`, 'warning');
+    }
+    if (newQuotesCount === 0 && conflictsResolved === 0) {
+        displayNotification('🔄 Sync Complete: Local data is up-to-date.', 'info');
+    }
+
+    // 4. (Optional) Simulate posting local *new* quotes back to server 
+    // await postQuotesToServer(newLocalQuotes);
+}
+
+// ----------------------------------------------------
+// PERIODIC CHECK AND UI ELEMENTS
+// ----------------------------------------------------
+
+// Step 1: Implement periodic data fetching
+const SYNC_INTERVAL_MS = 60000; // Sync every 60 seconds (1 minute)
+// Call syncQuotes() every minute
+let syncIntervalId = setInterval(syncQuotes, SYNC_INTERVAL_MS); 
+console.log(`Periodic sync started (interval: ${SYNC_INTERVAL_MS / 1000}s)`);
+
+
+// Step 3: Add a UI element or notification system
+function displayNotification(message, type = 'info') {
+    const notificationArea = document.getElementById('notification-area');
+    if (!notificationArea) {
+        console.warn(`Notification Area not found. Message: ${message}`);
+        return;
+    }
+
+    // Create a simple notification div
+    const div = document.createElement('div');
+    div.textContent = message;
+    div.className = `notification notification-${type}`; // Use CSS for styling
+    
+    // Append and automatically remove after 5 seconds
+    notificationArea.prepend(div);
+    setTimeout(() => {
+        div.remove();
+    }, 5000);
+}
+
+// Example: Manual conflict resolution option (triggered by a button)
+function promptManualConflictResolution() {
+    // In a real application, this would bring up a modal
+    // showing the local version vs. the server version
+    alert("Option to manually resolve conflicts is not fully implemented in this simulation. Default resolution (Server Precedence) has been applied.");
+    // A button in the UI could call: syncQuotes().then(() => displayNotification("Manual sync requested and completed.", 'info'));
+}
+
+// Ensure the HTML has a container for notifications:
+/*
+<div id="notification-area"></div>
+<button onclick="syncQuotes()">Manual Sync Now</button>
+<button onclick="promptManualConflictResolution()">Manual Conflict Resolution</button> 
+*/
