@@ -264,3 +264,99 @@ function importFromJsonFile(event) {
   // Clear the file input for re-use
   document.getElementById("importFile").value = "";
 }
+
+// script.js (Continuing from Task 0 and 1)
+
+const categoryFilter = document.getElementById("categoryFilter");
+
+// Function to populate the category filter dropdown
+function populateCategories() {
+  // 1. Get unique categories from the quotes array
+  const categories = [...new Set(quotes.map((quote) => quote.category))];
+
+  // 2. Clear existing options (except 'All Categories')
+  categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+  // 3. Create and append a new option for each category
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+}
+
+// Function to filter quotes based on the selected category
+function filterQuotes() {
+  const selectedCategory = categoryFilter.value;
+
+  // Save the selected filter to local storage for persistence (Step 2)
+  localStorage.setItem("lastSelectedCategory", selectedCategory);
+
+  // Determine which quotes to display
+  const filteredQuotes =
+    selectedCategory === "all"
+      ? quotes
+      : quotes.filter((quote) => quote.category === selectedCategory);
+
+  // If no quotes match the filter
+  if (filteredQuotes.length === 0) {
+    quoteDisplay.innerHTML = `<p>No quotes found in the "${selectedCategory}" category.</p>`;
+    return;
+  }
+
+  // Display a random quote from the filtered list
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const quote = filteredQuotes[randomIndex];
+
+  quoteDisplay.innerHTML = "";
+
+  const quoteElement = document.createElement("p");
+  quoteElement.textContent = `"${quote.text}"`;
+
+  const categoryElement = document.createElement("em");
+  categoryElement.textContent = `Category: ${quote.category}`;
+
+  quoteDisplay.appendChild(quoteElement);
+  quoteDisplay.appendChild(categoryElement);
+}
+
+// Function to restore the last selected filter on load (Step 2)
+function restoreFilter() {
+  const lastSelectedCategory = localStorage.getItem("lastSelectedCategory");
+  if (lastSelectedCategory) {
+    categoryFilter.value = lastSelectedCategory;
+  }
+}
+
+// **MODIFIED** Initialization flow
+loadQuotes(); // Load existing quotes
+populateCategories(); // Populate the dropdown with categories
+restoreFilter(); // Set the dropdown to the last filter
+filterQuotes(); // Display quotes based on the restored filter
+
+// **MODIFIED** addQuote to also update categories
+function addQuote() {
+  // ... (existing code for getting input and adding to quotes array) ...
+
+  if (newQuoteText && newQuoteCategory) {
+    quotes.push({
+      text: newQuoteText,
+      category: newQuoteCategory,
+    });
+
+    // ... (clear inputs) ...
+    saveQuotes();
+
+    // **NEW:** Update the categories dropdown
+    populateCategories();
+
+    // If the new category is different, it will be added to the dropdown.
+    // It's good practice to re-apply the filter after adding
+    filterQuotes();
+
+    alert("Quote added successfully!");
+  } else {
+    alert("Please enter both quote text and category.");
+  }
+}
