@@ -360,3 +360,99 @@ function addQuote() {
     alert("Please enter both quote text and category.");
   }
 }
+
+// script.js (Continuing from all previous tasks)
+
+// Simulated server data (can be replaced with fetch to a real API)
+let serverQuotes = [
+  {
+    text: "Server: Consistency is the key to mastery.",
+    category: "Discipline",
+    id: 1,
+  },
+  {
+    text: "Server: Code is read much more often than it is written.",
+    category: "Programming",
+    id: 2,
+  },
+];
+
+// Helper function to simulate fetching data from a server
+async function getServerQuotes() {
+  // Simulate network delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  // In a real app: const response = await fetch('YOUR_API_ENDPOINT/quotes');
+  // const data = await response.json();
+  // return data;
+
+  return serverQuotes; // Return the simulated data
+}
+
+// Function to sync local data with server data
+async function syncQuotes() {
+  console.log("Starting data sync...");
+
+  const serverData = await getServerQuotes();
+
+  if (!serverData) {
+    console.error("Failed to fetch server data.");
+    return;
+  }
+
+  // Server-Wins Conflict Resolution Strategy (Step 2)
+  // The server's quotes array is considered the source of truth.
+  // We append any *unique* local quotes that are missing from the server.
+
+  let mergedQuotes = [...serverData];
+  let conflictCount = 0;
+  let newLocalCount = 0;
+
+  // Simple resolution: quotes with the same text/category are considered conflicts,
+  // and the server's version (if any) is kept.
+  // For a robust system, you'd use unique IDs and timestamps.
+  const serverQuoteTexts = new Set(serverData.map((q) => q.text));
+
+  quotes.forEach((localQuote) => {
+    if (!serverQuoteTexts.has(localQuote.text)) {
+      // This is a new quote only available locally
+      mergedQuotes.push(localQuote);
+      newLocalCount++;
+    } else {
+      // A quote with the same text exists on the server.
+      // Under the "Server Wins" rule, we discard the local copy if it's different.
+      conflictCount++;
+    }
+  });
+
+  quotes = mergedQuotes; // Update the local array with the merged data
+  saveQuotes(); // Save the new array to local storage
+  populateCategories(); // Update filter options
+  filterQuotes(); // Refresh display
+
+  // Notification System (Step 3)
+  let syncMessage = `Sync complete. ${serverData.length} quotes from server.`;
+  if (newLocalCount > 0) {
+    syncMessage += ` ${newLocalCount} new local quotes added.`;
+  }
+  if (conflictCount > 0) {
+    syncMessage += ` ${conflictCount} potential local conflicts resolved (Server Wins).`;
+  }
+
+  alert(`Data Sync Status:\n${syncMessage}`);
+  console.log(syncMessage);
+}
+
+// Set up periodic syncing (e.g., every 60 seconds)
+// Note: In a real app, this should only happen when the user is active.
+// setInterval(syncQuotes, 60000);
+
+// Add a manual sync button to index.html
+// <button onclick="syncQuotes()">Manual Sync with Server</button>
+
+// Initial sync on page load (after loading local quotes)
+// loadQuotes();
+// syncQuotes();
+// populateCategories();
+// restoreFilter();
+// filterQuotes();
