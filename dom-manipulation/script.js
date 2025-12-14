@@ -559,3 +559,46 @@ function promptManualConflictResolution() {
 <button onclick="syncQuotes()">Manual Sync Now</button>
 <button onclick="promptManualConflictResolution()">Manual Conflict Resolution</button> 
 */
+
+// Step 3: Add a UI element or notification system
+function displayNotification(message, type = 'info') {
+    const notificationArea = document.getElementById('notification-area');
+    // IMPORTANT: Make sure you have a div with id="notification-area" in your HTML
+    if (!notificationArea) {
+        console.warn(`Notification Area not found. Message: ${message}`);
+        return;
+    }
+
+    // Create a simple notification div
+    const div = document.createElement('div');
+    div.textContent = message;
+    // Add CSS classes for styling: e.g., notification-success, notification-warning, etc.
+    div.className = `notification notification-${type}`; 
+    
+    // Append and automatically remove after 5 seconds
+    notificationArea.prepend(div);
+    setTimeout(() => {
+        if(div.parentElement) div.remove();
+    }, 5000);
+}
+
+// Inside the syncQuotes function, replace the old notification block with this:
+    
+    // 2. Update local storage with the resolved data
+    saveLocalQuotes(newLocalQuotes);
+
+    // 3. Notify the user based on the outcome
+    let syncSuccessMessage = "Quotes synced with server!"; // The specific check you required
+    
+    if (newQuotesCount > 0 || conflictsResolved > 0) {
+        // If there were specific changes, use a more detailed message
+        let detail = [];
+        if (newQuotesCount > 0) detail.push(`${newQuotesCount} new quote(s)`);
+        if (conflictsResolved > 0) detail.push(`${conflictsResolved} conflict(s) resolved`);
+        
+        displayNotification(`✅ ${syncSuccessMessage} (${detail.join(' and ')}).`, 'success');
+        
+    } else {
+        // If the data was already consistent
+        displayNotification(`🔄 ${syncSuccessMessage} (Data is up-to-date).`, 'info');
+    }
