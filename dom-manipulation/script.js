@@ -149,3 +149,118 @@ function exportQuotes() {
 
 importFile.addEventListener("onchange", importFromJsonFile);
 exportButton.addEventListener("click", exportQuotes);
+
+// script.js (Continuing from Task 0)
+
+// Function to save quotes to Local Storage
+function saveQuotes() {
+  // Convert the JavaScript array to a JSON string before saving
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
+// Function to load quotes from Local Storage
+function loadQuotes() {
+  const storedQuotes = localStorage.getItem("quotes");
+  if (storedQuotes) {
+    // Parse the JSON string back into a JavaScript array
+    quotes = JSON.parse(storedQuotes);
+  }
+  // If no stored quotes, the initial array from Task 0 is used.
+}
+
+// Modify addQuote to use saveQuotes()
+function addQuote() {
+  // ... (existing code for getting input and validation) ...
+  const newQuoteText = document.getElementById("newQuoteText").value.trim();
+  const newQuoteCategory = document
+    .getElementById("newQuoteCategory")
+    .value.trim();
+
+  if (newQuoteText && newQuoteCategory) {
+    quotes.push({
+      text: newQuoteText,
+      category: newQuoteCategory,
+    });
+
+    document.getElementById("newQuoteText").value = "";
+    document.getElementById("newQuoteCategory").value = "";
+
+    // **NEW:** Save the updated array to Local Storage
+    saveQuotes();
+
+    showRandomQuote();
+    alert("Quote added successfully!");
+  } else {
+    alert("Please enter both quote text and category.");
+  }
+}
+
+// Call loadQuotes() before the initial display
+loadQuotes();
+// showRandomQuote() is called here or after loadQuotes()
+showRandomQuote();
+
+// script.js (Continuing from Task 0 and 1)
+
+// Function to export quotes to a JSON file
+function exportToJsonFile() {
+  // 1. Convert the quotes array to a JSON string
+  const jsonString = JSON.stringify(quotes, null, 2);
+
+  // 2. Create a Blob (a file-like object) from the JSON string
+  const blob = new Blob([jsonString], { type: "application/json" });
+
+  // 3. Create a temporary URL for the Blob
+  const url = URL.createObjectURL(blob);
+
+  // 4. Create a temporary link element for downloading
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "quotes_export.json";
+
+  // 5. Programmatically click the link to start the download
+  document.body.appendChild(a);
+  a.click();
+
+  // 6. Clean up the temporary elements and URL
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Function to import quotes from a JSON file (provided in the task)
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function (event) {
+    try {
+      // Parse the imported JSON string
+      const importedQuotes = JSON.parse(event.target.result);
+
+      // Validate that it's an array of objects (basic check)
+      if (
+        Array.isArray(importedQuotes) &&
+        importedQuotes.every((q) => q.text && q.category)
+      ) {
+        // Add the imported quotes to the existing array
+        quotes.push(...importedQuotes);
+
+        // Save the combined array to local storage
+        saveQuotes();
+
+        // Refresh display and categories (for later tasks)
+        showRandomQuote();
+
+        alert("Quotes imported successfully!");
+      } else {
+        alert(
+          "Invalid JSON file format. Please ensure it is an array of quote objects."
+        );
+      }
+    } catch (e) {
+      alert("Error parsing JSON file: " + e.message);
+    }
+  };
+  // Read the file content as text
+  fileReader.readAsText(event.target.files[0]);
+  // Clear the file input for re-use
+  document.getElementById("importFile").value = "";
+}
